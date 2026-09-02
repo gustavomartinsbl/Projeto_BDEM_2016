@@ -63,13 +63,21 @@ nrow(dados_sim_2)
 # Atenção: a unidade de medida de IDADE no DICIONÀRIO do SIM está errada
 # O propósito das avaliações acima é verificar se as categorias estão de acordo com o dicionário do SIM ou se aparecem categorias estranhas
 
+cat("TIPOBITO\n")
 table(dados_sim_2$TIPOBITO, useNA = "ifany")
+cat("\nSEXO\n")
 table(dados_sim_2$SEXO, useNA = "ifany")
+cat("\nRACACOR\n")
 table(dados_sim_2$RACACOR, useNA = "ifany")
+cat("\nESC2010\n")
 table(dados_sim_2$ESC2010, useNA = "ifany")
+cat("\nTPMORTEOCO\n")
 table(dados_sim_2$TPMORTEOCO, useNA = "ifany")
+cat("\nCAUSABAS\n")
 table(dados_sim_2$CAUSABAS, useNA = "ifany")
+cat("\nUNIDADE DA IDADE\n")
 table(substr(dados_sim_2$IDADE, 1, 1), useNA = "ifany")
+cat("\nIDADE COMPLETA\n")
 table(dados_sim_2$IDADE, useNA = "ifany")
 
 # Ao terminar a Tarefa 4 commit com a mensagem "script BDEM - SIM - tarefas 1 a 4" e envie para o repositório Projeto_BDEM_2016
@@ -80,13 +88,16 @@ table(dados_sim_2$IDADE, useNA = "ifany")
 # Verifique o dicionário do SIM para identificar qual o código das categorias de cada variável
 # Em variáveis quantitativas como IDADE verificar se existem valores como 9999 para NA
 
-dados_sim_2$SEXO[dados_sim_2$SEXO == "0"] = NA
-dados_sim_2$SEXO[dados_sim_2$SEXO == "9"] = NA
-dados_sim_2$ESC2010[dados_sim_2$ESC2010 == "9"] = NA
-dados_sim_2$TPMORTEOCO[dados_sim_2$TPMORTEOCO == "9"] = NA
-dados_sim_2$IDADE[dados_sim_2$IDADE == "999"] = NA
-
+dados_sim_2$TIPOBITO[dados_sim_2$TIPOBITO == "9"] <- NA
+dados_sim_2$SEXO[dados_sim_2$SEXO %in% c("0", "9")] <- NA
+dados_sim_2$RACACOR[dados_sim_2$RACACOR == "9"] <- NA
+dados_sim_2$ESC2010[dados_sim_2$ESC2010 == "9"] <- NA
+dados_sim_2$TPMORTEOCO[dados_sim_2$TPMORTEOCO == "9"] <- NA
+dados_sim_2$IDADE[dados_sim_2$IDADE == "9999"] <- NA
+dados_sim_2$IDADE[dados_sim_2$IDADE == "9"] <- NA
+table(dados_sim_2$TIPOBITO, useNA = "ifany")
 table(dados_sim_2$SEXO, useNA = "ifany")
+table(dados_sim_2$RACACOR, useNA = "ifany")
 table(dados_sim_2$ESC2010, useNA = "ifany")
 table(dados_sim_2$TPMORTEOCO, useNA = "ifany")
 table(dados_sim_2$IDADE, useNA = "ifany")
@@ -100,6 +111,38 @@ table(dados_sim_2$IDADE, useNA = "ifany")
 # ATENçÃO: 1. Na hora de escrever os labels, somente a PRIMEIRA LETRA da legenda é maiúscula. Exemplo para SEXO: Feminino e Masculino
 #          2. Nesta Tarefa 6 não crie novas variáveis dentro do banco de dados
 
+dados_sim_2$TIPOBITO = factor(dados_sim_2$TIPOBITO,
+                              levels = c("1", "2"),
+                              labels = c("Fetal", "Não fetal"))
+
+dados_sim_2$SEXO = factor(dados_sim_2$SEXO,
+                          levels = c("1", "2"),
+                          labels = c("Masculino", "Feminino"))
+
+dados_sim_2$RACACOR = factor(dados_sim_2$RACACOR,
+                             levels = c("1", "2", "3", "4", "5"),
+                             labels = c("Branca", "Preta", "Amarela", 
+                                        "Parda", "Indígena"))
+
+dados_sim_2$ESC2010 = factor(dados_sim_2$ESC2010,
+                             levels = c("0", "1", "2", "3", "4", "5"),
+                             labels = c("Sem escolaridade",
+                                        "Fundamental I",
+                                        "Fundamental II",
+                                        "Médio",
+                                        "Superior incompleto",
+                                        "Superior completo"))
+
+dados_sim_2$TPMORTEOCO = factor(dados_sim_2$TPMORTEOCO,
+                                levels = c("1", "2", "3", "4", "5", "8"),
+                                labels = c("Na gravidez",
+                                           "No parto",
+                                           "No abortamento",
+                                           "Até 42 dias após o término do parto",
+                                           "De 43 dias a 1 ano após o término da gestação",
+                                           "Não ocorreu nestes períodos"))
+
+str(dados_sim_2)
 
 # Ao terminar a Tarefa 6 commit com a mensagem "script BDEM - SIM - tarefas 1 a 6" e envie para o repositório Projeto_BDEM_2016
 
