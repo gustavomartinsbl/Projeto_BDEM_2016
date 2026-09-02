@@ -63,6 +63,14 @@ nrow(dados_sim_2)
 # Atenção: a unidade de medida de IDADE no DICIONÀRIO do SIM está errada
 # O propósito das avaliações acima é verificar se as categorias estão de acordo com o dicionário do SIM ou se aparecem categorias estranhas
 
+table(dados_sim_2$TIPOBITO, useNA = "ifany")
+table(dados_sim_2$SEXO, useNA = "ifany")
+table(dados_sim_2$RACACOR, useNA = "ifany")
+table(dados_sim_2$ESC2010, useNA = "ifany")
+table(dados_sim_2$TPMORTEOCO, useNA = "ifany")
+table(dados_sim_2$CAUSABAS, useNA = "ifany")
+table(substr(dados_sim_2$IDADE, 1, 1), useNA = "ifany")
+table(dados_sim_2$IDADE, useNA = "ifany")
 
 # Ao terminar a Tarefa 4 commit com a mensagem "script BDEM - SIM - tarefas 1 a 4" e envie para o repositório Projeto_BDEM_2016
 
