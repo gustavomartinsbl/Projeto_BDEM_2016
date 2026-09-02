@@ -50,6 +50,8 @@ str(dados_sim_1)
 # 41:74740     42:40270    43:87583
 # 50:16749     51:17535    52:38074    53:12050 
 
+dados_sim_2 = dados_sim_1[substr(dados_sim_1$CODMUNRES, 1, 2) == "25", ]
+nrow(dados_sim_2)
 
 # Ao terminar a Tarefa 3 commit com a mensagem "script BDEM - SIM - tarefas 1 a 3" e envie para o repositório Projeto_BDEM_2016
 
