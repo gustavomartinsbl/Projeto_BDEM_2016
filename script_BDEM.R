@@ -302,6 +302,11 @@ str(SIM_PB)
 
 # Tarefa 8. Exportar o banco de dados com o nome SIM_UF.csv (Exemplo: SIM_RJ.csv)
 
+write.csv(SIM_PB,
+          file = "SIM_PB.csv",
+          row.names = FALSE,
+          na = "")
+
 # Ao terminar a Tarefa 8 fazer um commit com o comentário "dados SIM_UF 2016 e script - SIM - tarefas 1 a 8"  e envie para o repositório Projeto_BDEM_2016
 
 
