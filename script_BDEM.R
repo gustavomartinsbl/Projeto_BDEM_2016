@@ -151,9 +151,154 @@ str(dados_sim_2)
 # Tarefa 7. Criar um banco de dados, de nome SIM_UF.csv (Exemplo: SIM_RJ.csv), contendo as variáveis listadas no arquivo “Variáveis - Projeto - Tarefa 7 - SIM.pdf”
 # Atenção: a ordem das variáveis do arquivo deve ser respeitada
 
+# Tarefa 7. Criar o banco SIM_PB.csv
+
+# Identificar a unidade e o valor da idade
+idade_unidade = substr(dados_sim_2$IDADE, 1, 1)
+idade_valor = as.numeric(substr(dados_sim_2$IDADE, 2, 3))
+
+# Transformar a idade em dias
+idade_dias = ifelse(idade_unidade == "1", idade_valor / 24,
+                    ifelse(idade_unidade == "2", idade_valor,
+                           ifelse(idade_unidade == "3", idade_valor * 30,
+                                  ifelse(idade_unidade == "4", idade_valor * 365,
+                                         ifelse(idade_unidade == "5", 101 * 365, NA)))))
+
+# Criar o banco final
+SIM_PB = data.frame(
+  ANO = 2016,
+  NIVEL = "UF",
+  CODMUNRES = "25",
+  TO = nrow(dados_sim_2),
+  TORC = sum(complete.cases(dados_sim)),
+  TORCR = sum(complete.cases(dados_sim_2)),
+  TO_NN = sum(grepl("^[V-Y]", dados_sim_2$CAUSABAS), na.rm = TRUE),
+  TO_N = sum(!grepl("^[V-Y]", dados_sim_2$CAUSABAS), na.rm = TRUE),
+  TO_CB_I = sum(grepl("^A|^B", dados_sim_2$CAUSABAS), na.rm = TRUE),
+  TO_CB_N = sum(grepl("^C|^D", dados_sim_2$CAUSABAS), na.rm = TRUE),
+  TO_CB_C = sum(grepl("^I", dados_sim_2$CAUSABAS), na.rm = TRUE),
+  TO_CB_R = sum(grepl("^J", dados_sim_2$CAUSABAS), na.rm = TRUE),
+  TO_CB_O = sum(!grepl("^[V-Y]|^[A-B]|^[C-D]|^I|^J", 
+                       dados_sim_2$CAUSABAS), na.rm = TRUE),
+  TO_M = sum(dados_sim_2$SEXO == "Masculino", na.rm = TRUE),
+  TO_F = sum(dados_sim_2$SEXO == "Feminino", na.rm = TRUE),
+  TO_F_IF = sum(dados_sim_2$SEXO == "Feminino" & 
+                  idade_dias >= 15 * 365 & 
+                  idade_dias <= 49 * 365, na.rm = TRUE),
+  TO_FT = sum(dados_sim_2$TIPOBITO == "Fetal", na.rm = TRUE),
+  TO_NT = sum(dados_sim_2$TIPOBITO == "Não fetal" &
+                idade_dias >= 0 & idade_dias <= 27, na.rm = TRUE),
+  TO_NT_P = sum(dados_sim_2$TIPOBITO == "Não fetal" &
+                  idade_dias >= 0 & idade_dias <= 6, na.rm = TRUE),
+  TO_NT_T = sum(dados_sim_2$TIPOBITO == "Não fetal" &
+                  idade_dias >= 7 & idade_dias <= 27, na.rm = TRUE),
+  TO_PNT = sum(dados_sim_2$TIPOBITO == "Não fetal" &
+                 idade_dias >= 28 & idade_dias <= 364, na.rm = TRUE),
+  TONT_B = sum(dados_sim_2$TIPOBITO == "Não fetal" &
+                 idade_dias >= 0 & idade_dias <= 27 &
+                 dados_sim_2$RACACOR == "Branca", na.rm = TRUE),
+  TONT_PT = sum(dados_sim_2$TIPOBITO == "Não fetal" &
+                  idade_dias >= 0 & idade_dias <= 27 &
+                  dados_sim_2$RACACOR == "Preta", na.rm = TRUE),
+  TONT_A = sum(dados_sim_2$TIPOBITO == "Não fetal" &
+                 idade_dias >= 0 & idade_dias <= 27 &
+                 dados_sim_2$RACACOR == "Amarela", na.rm = TRUE),
+  TONT_PD = sum(dados_sim_2$TIPOBITO == "Não fetal" &
+                  idade_dias >= 0 & idade_dias <= 27 &
+                  dados_sim_2$RACACOR == "Parda", na.rm = TRUE),
+  TONT_I = sum(dados_sim_2$TIPOBITO == "Não fetal" &
+                 idade_dias >= 0 & idade_dias <= 27 &
+                 dados_sim_2$RACACOR == "Indígena", na.rm = TRUE),
+  TO_MT = sum(dados_sim_2$SEXO == "Feminino" &
+                dados_sim_2$TPMORTEOCO %in% c(
+                  "Na gravidez",
+                  "No parto",
+                  "No abortamento",
+                  "Até 42 dias após o término do parto",
+                  "De 43 dias a 1 ano após o término da gestação"
+                ), na.rm = TRUE),
+  TO_MT_DG = sum(dados_sim_2$SEXO == "Feminino" &
+                   dados_sim_2$TPMORTEOCO == "Na gravidez", na.rm = TRUE),
+  TO_MT_PT = sum(dados_sim_2$SEXO == "Feminino" &
+                   dados_sim_2$TPMORTEOCO == "No parto", na.rm = TRUE),
+  TO_MT_AB = sum(dados_sim_2$SEXO == "Feminino" &
+                   dados_sim_2$TPMORTEOCO == "No abortamento", na.rm = TRUE),
+  TO_MT_42 = sum(dados_sim_2$SEXO == "Feminino" &
+                   dados_sim_2$TPMORTEOCO == "Até 42 dias após o término do parto", 
+                 na.rm = TRUE),
+  TO_MT_43 = sum(dados_sim_2$SEXO == "Feminino" &
+                   dados_sim_2$TPMORTEOCO == "De 43 dias a 1 ano após o término da gestação", 
+                 na.rm = TRUE),
+  TO_MT_P = sum(dados_sim_2$SEXO == "Feminino" &
+                  dados_sim_2$TPMORTEOCO %in% c(
+                    "Na gravidez",
+                    "No parto",
+                    "No abortamento",
+                    "Até 42 dias após o término do parto"
+                  ), na.rm = TRUE),
+  TO_MT_P_I = sum(dados_sim_2$SEXO == "Feminino" &
+                    dados_sim_2$TPMORTEOCO %in% c(
+                      "Na gravidez",
+                      "No parto",
+                      "No abortamento",
+                      "Até 42 dias após o término do parto"
+                    ) &
+                    idade_dias >= 15 * 365 &
+                    idade_dias <= 49 * 365, na.rm = TRUE),
+  TO_MT_P_ES = sum(dados_sim_2$SEXO == "Feminino" &
+                     dados_sim_2$TPMORTEOCO %in% c(
+                       "Na gravidez",
+                       "No parto",
+                       "No abortamento",
+                       "Até 42 dias após o término do parto"
+                     ) &
+                     dados_sim_2$ESC2010 == "Sem escolaridade", na.rm = TRUE),
+  TO_MT_P_EFI = sum(dados_sim_2$SEXO == "Feminino" &
+                      dados_sim_2$TPMORTEOCO %in% c(
+                        "Na gravidez",
+                        "No parto",
+                        "No abortamento",
+                        "Até 42 dias após o término do parto"
+                      ) &
+                      dados_sim_2$ESC2010 == "Fundamental I", na.rm = TRUE),
+  TO_MT_P_EFII = sum(dados_sim_2$SEXO == "Feminino" &
+                       dados_sim_2$TPMORTEOCO %in% c(
+                         "Na gravidez",
+                         "No parto",
+                         "No abortamento",
+                         "Até 42 dias após o término do parto"
+                       ) &
+                       dados_sim_2$ESC2010 == "Fundamental II", na.rm = TRUE),
+  TO_MT_P_EM = sum(dados_sim_2$SEXO == "Feminino" &
+                     dados_sim_2$TPMORTEOCO %in% c(
+                       "Na gravidez",
+                       "No parto",
+                       "No abortamento",
+                       "Até 42 dias após o término do parto"
+                     ) &
+                     dados_sim_2$ESC2010 == "Médio", na.rm = TRUE),
+  TO_MT_P_ESI = sum(dados_sim_2$SEXO == "Feminino" &
+                      dados_sim_2$TPMORTEOCO %in% c(
+                        "Na gravidez",
+                        "No parto",
+                        "No abortamento",
+                        "Até 42 dias após o término do parto"
+                      ) &
+                      dados_sim_2$ESC2010 == "Superior incompleto", na.rm = TRUE),
+  TO_MT_P_ESC = sum(dados_sim_2$SEXO == "Feminino" &
+                      dados_sim_2$TPMORTEOCO %in% c(
+                        "Na gravidez",
+                        "No parto",
+                        "No abortamento",
+                        "Até 42 dias após o término do parto"
+                      ) &
+                      dados_sim_2$ESC2010 == "Superior completo", na.rm = TRUE)
+)
+
+names(SIM_PB)
+str(SIM_PB)
 
 # Ao terminar a Tarefa 7 commit com a mensagem "script BDEM - SIM - tarefas 1 a 7" e envie para o repositório Projeto_BDEM_2016
-
 
 # Tarefa 8. Exportar o banco de dados com o nome SIM_UF.csv (Exemplo: SIM_RJ.csv)
 
