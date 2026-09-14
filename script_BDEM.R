@@ -322,6 +322,16 @@ write.csv(SIM_PB,
 # Por uma questão de padronização coloque todos os nomes das variáveis em letra maiúscula,
 # usando o comando names(dados_sinasc) = toupper(names(dados_sinasc))
 
+dados_sinasc = read.csv("SINASC_2016.csv",
+                        sep = ";",
+                        header = TRUE,
+                        stringsAsFactors = FALSE)
+
+dim(dados_sinasc)
+str(dados_sinasc)
+
+names(dados_sinasc) = toupper(names(dados_sinasc))
+names(dados_sinasc)
 
 # Ao terminar a Tarefa 1 commit com a mensagem "script BDEM - SINASC - tarefa 1" e envie para o repositório Projeto_BDEM_2016
 
