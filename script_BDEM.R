@@ -633,6 +633,89 @@ str(dados_sinasc_2)
 # nova variável: dados_sinasc_2$ESTCIV: Sem companheiro: ESTCIVMAE 1, 3 ou 4, Com companheiro: ESTCIVMAE 2 ou 5
 # Ao categorizar as variáveis, garantir que sejam transformadas em tipo fator
 
+# Tarefa 7. Categorizar PESO
+dados_sinasc_2$F_PESO = cut(
+  as.numeric(dados_sinasc_2$PESO),
+  breaks = c(-Inf, 2499, 3999, Inf),
+  labels = c(
+    "Baixo peso",
+    "Peso normal",
+    "Macrossomia"
+  )
+)
+
+# Categorizar IDADEMAE
+dados_sinasc_2$F_IDADE = cut(
+  as.numeric(dados_sinasc_2$IDADEMAE),
+  breaks = c(-Inf, 14, 19, 24, 29, 34, 39, 44, 49, Inf),
+  labels = c(
+    "<15",
+    "15-19",
+    "20-24",
+    "25-29",
+    "30-34",
+    "35-39",
+    "40-44",
+    "45-49",
+    "50+"
+  )
+)
+
+# Categorizar APGAR5
+dados_sinasc_2$F_APGAR5 = cut(
+  as.numeric(dados_sinasc_2$APGAR5),
+  breaks = c(-Inf, 6, Inf),
+  labels = c(
+    "Baixo",
+    "Normal"
+  )
+)
+
+# Criar variável de peregrinação
+dados_sinasc_2$PEREG = ifelse(
+  is.na(dados_sinasc_2$CODMUNNASC) |
+    is.na(dados_sinasc_2$CODMUNRES),
+  NA,
+  ifelse(
+    dados_sinasc_2$CODMUNNASC == dados_sinasc_2$CODMUNRES,
+    "Não",
+    "Sim"
+  )
+)
+dados_sinasc_2$PEREG = factor(
+  dados_sinasc_2$PEREG,
+  levels = c("Não", "Sim")
+)
+
+# Criar variável de estado civil
+
+dados_sinasc_2$ESTCIV = ifelse(
+  is.na(dados_sinasc_2$ESTCIVMAE),
+  NA,
+  ifelse(
+    dados_sinasc_2$ESTCIVMAE %in% c(
+      "Solteira",
+      "Viúva",
+      "Separada judicialmente/divorciada"
+    ),
+    "Sem companheiro",
+    ifelse(
+      dados_sinasc_2$ESTCIVMAE %in% c(
+        "Casada",
+        "União estável"
+      ),
+      "Com companheiro",
+      NA
+    )
+  )
+)
+dados_sinasc_2$ESTCIV = factor(
+  dados_sinasc_2$ESTCIV,
+  levels = c(
+    "Sem companheiro",
+    "Com companheiro"
+  )
+)
 
 # Ao terminar a Tarefa 7 commit com a mensagem "script BDEM - SINASC - tarefas 1 a 7" e envie para o repositório Projeto_BDEM_2016
 
