@@ -401,6 +401,25 @@ nrow(dados_sinasc_2)
 # SEXO, RACACOR, IDANOMAL, ESCMAE2010, RACACORMAE, TPAPRESENT, TPROBSON, PARIDADE, KOTELCHUCK
 # Avalie também os valores das variáveis quantitativas de IDADEMAE, SEMAGESTAC, APGAR5 e PESO
 
+table(dados_sinasc_2$LOCNASC, useNA = "ifany")
+table(dados_sinasc_2$ESTCIVMAE, useNA = "ifany")
+table(dados_sinasc_2$GESTACAO, useNA = "ifany")
+table(dados_sinasc_2$GRAVIDEZ, useNA = "ifany")
+table(dados_sinasc_2$PARTO, useNA = "ifany")
+table(dados_sinasc_2$SEXO, useNA = "ifany")
+table(dados_sinasc_2$RACACOR, useNA = "ifany")
+table(dados_sinasc_2$IDANOMAL, useNA = "ifany")
+table(dados_sinasc_2$ESCMAE2010, useNA = "ifany")
+table(dados_sinasc_2$RACACORMAE, useNA = "ifany")
+table(dados_sinasc_2$TPAPRESENT, useNA = "ifany")
+table(dados_sinasc_2$TPROBSON, useNA = "ifany")
+table(dados_sinasc_2$PARIDADE, useNA = "ifany")
+table(dados_sinasc_2$KOTELCHUCK, useNA = "ifany")
+
+summary(dados_sinasc_2$IDADEMAE)
+summary(dados_sinasc_2$SEMAGESTAC)
+summary(dados_sinasc_2$APGAR5)
+summary(dados_sinasc_2$PESO)
 
 # Ao terminar a Tarefa 4 commit com a mensagem "script BDEM - SINASC - tarefas 1 a 4" e envie para o repositório Projeto_BDEM_2016
 
