@@ -387,6 +387,12 @@ str(dados_sinasc_1)
 # 41: 155066    42: 95313     43: 141411
 # 50: 42432     51: 53531     52: 95563     53: 43340 
 
+dados_sinasc_2 = dados_sinasc_1[
+  substr(dados_sinasc_1$CODMUNRES, 1, 2) == "25",
+]
+
+dim(dados_sinasc_2)
+nrow(dados_sinasc_2)
 
 # Ao terminar a Tarefa 3 commit com a mensagem "script BDEM - SINASC - tarefas 1 a 3" e envie para o repositório Projeto_BDEM_2016
 
