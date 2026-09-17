@@ -147,6 +147,8 @@ str(dados_sim_2)
 
 # Ao terminar a Tarefa 6 commit com a mensagem "script BDEM - SIM - tarefas 1 a 6" e envie para o repositório Projeto_BDEM_2016
 
+# Tarefa 7. Criar um banco de dados, de nome SIM_UF.csv (Exemplo: SIM_RJ.csv), contendo as variáveis listadas no arquivo “Variáveis - Projeto - Tarefa 7 - SIM.pdf”
+# Atenção: a ordem das variáveis do arquivo deve ser respeitada 
 
 LETRA = substr(dados_sim_2$CAUSABAS, 1, 1)
 NUM = as.numeric(substr(dados_sim_2$CAUSABAS, 2, 3))
