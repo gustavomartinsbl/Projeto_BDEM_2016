@@ -814,6 +814,7 @@ dados_sinasc_2 = dados_sinasc_1[
 
 dim(dados_sinasc_2)
 nrow(dados_sinasc_2)
+nrow(dados_sinasc_2)
 
 # Ao terminar a Tarefa 3 commit com a mensagem "script BDEM - SINASC - tarefas 1 a 3" e envie para o repositório Projeto_BDEM_2016
 
