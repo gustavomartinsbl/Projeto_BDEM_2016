@@ -1209,6 +1209,1236 @@ table(dados_sinasc_2$F_PIG, useNA = "ifany")
 # Atenção: a ordem das variáveis do arquivo deve ser respeitada
 
 
+municipios = sort(unique(dados_sinasc_2$CODMUNRES))
+
+g = factor(
+  dados_sinasc_2$CODMUNRES,
+  levels = municipios
+)
+
+base = data.frame(
+  CODMUNRES = municipios
+)
+
+# FUNÇÃO PARA CONTAGEM POR MUNICÍPIO
+
+
+contar = function(condicao) {
+  
+  if (length(condicao) == 1) {
+    condicao = rep(condicao, nrow(dados_sinasc_2))
+  }
+  
+  condicao[is.na(condicao)] = FALSE
+  
+  resultado = tapply(
+    as.integer(condicao),
+    g,
+    sum
+  )
+  
+  as.numeric(resultado)
+}
+
+# FUNÇÃO PARA ESTATÍSTICAS POR MUNICÍPIO
+
+
+estatistica = function(x, funcao) {
+  
+  resultado = tapply(
+    x,
+    g,
+    function(z) {
+      
+      if (all(is.na(z))) {
+        return(NA)
+      }
+      
+      funcao(z, na.rm = TRUE)
+      
+    }
+  )
+  
+  as.numeric(resultado)
+}
+
+
+# INFORMAÇÕES SOBRE OS NASCIMENTOS
+
+# 4 TN - Total de nascimentos
+
+base$TN = contar(TRUE)
+
+
+# 5 TNRC - Total de nascimentos com registros completos
+# nas 61 variáveis do SINASC
+
+dados_sinasc_UF = dados_sinasc[
+  substr(
+    as.character(dados_sinasc$CODMUNRES),
+    1,
+    2
+  ) == "25",
+]
+
+dados_sinasc_UF_comp = dados_sinasc_UF[
+  complete.cases(dados_sinasc_UF),
+]
+
+base$TNRC = contar(
+  dados_sinasc_2$CONTADOR %in%
+    dados_sinasc_UF_comp$CONTADOR
+)
+
+
+# 6 TNRCR - Total de nascimentos com registros completos
+# nas variáveis selecionadas
+
+variaveis_TNRCR = c(
+  "CODMUNNASC",
+  "LOCNASC",
+  "IDADEMAE",
+  "ESTCIVMAE",
+  "CODMUNRES",
+  "GESTACAO",
+  "GRAVIDEZ",
+  "PARTO",
+  "SEXO",
+  "APGAR5",
+  "RACACOR",
+  "PESO",
+  "IDANOMAL",
+  "ESCMAE2010",
+  "RACACORMAE",
+  "SEMAGESTAC",
+  "TPAPRESENT",
+  "TPROBSON",
+  "PARIDADE",
+  "KOTELCHUCK",
+  "CONTADOR"
+)
+
+dados_TNRCR = dados_sinasc_2[
+  complete.cases(
+    dados_sinasc_2[, variaveis_TNRCR]
+  ),
+]
+
+base$TNRCR = contar(
+  dados_sinasc_2$CONTADOR %in%
+    dados_TNRCR$CONTADOR
+)
+
+# 7 TGI_15 - idade inferior a 15 anos
+
+base$TGI_15 = contar(
+  dados_sinasc_2$IDADEMAE < 15
+)
+
+
+# 8 TGI_15_19
+
+base$TGI_15_19 = contar(
+  dados_sinasc_2$IDADEMAE >= 15 &
+    dados_sinasc_2$IDADEMAE <= 19
+)
+
+
+# 9 TGI_20_24
+
+base$TGI_20_24 = contar(
+  dados_sinasc_2$IDADEMAE >= 20 &
+    dados_sinasc_2$IDADEMAE <= 24
+)
+
+
+# 10 TGI_25_29
+
+base$TGI_25_29 = contar(
+  dados_sinasc_2$IDADEMAE >= 25 &
+    dados_sinasc_2$IDADEMAE <= 29
+)
+
+
+# 11 TGI_30_34
+
+base$TGI_30_34 = contar(
+  dados_sinasc_2$IDADEMAE >= 30 &
+    dados_sinasc_2$IDADEMAE <= 34
+)
+
+
+# 12 TGI_35_39
+
+base$TGI_35_39 = contar(
+  dados_sinasc_2$IDADEMAE >= 35 &
+    dados_sinasc_2$IDADEMAE <= 39
+)
+
+
+# 13 TGI_40_44
+
+base$TGI_40_44 = contar(
+  dados_sinasc_2$IDADEMAE >= 40 &
+    dados_sinasc_2$IDADEMAE <= 44
+)
+
+
+# 14 TGI_45_49
+
+base$TGI_45_49 = contar(
+  dados_sinasc_2$IDADEMAE >= 45 &
+    dados_sinasc_2$IDADEMAE <= 49
+)
+
+
+# 15 TGI_50
+
+base$TGI_50 = contar(
+  dados_sinasc_2$IDADEMAE >= 50
+)
+
+
+# 16 TGIF - idade fértil (15 a 49 anos)
+
+base$TGIF = contar(
+  dados_sinasc_2$IDADEMAE >= 15 &
+    dados_sinasc_2$IDADEMAE <= 49
+)
+
+
+# 17 IM_P25 - percentil 25 da idade materna
+
+base$IM_P25 = estatistica(
+  as.numeric(dados_sinasc_2$IDADEMAE),
+  function(x, na.rm) {
+    quantile(x, 0.25, na.rm = na.rm)
+  }
+)
+
+
+# 18 IM_P50
+
+base$IM_P50 = estatistica(
+  as.numeric(dados_sinasc_2$IDADEMAE),
+  function(x, na.rm) {
+    quantile(x, 0.50, na.rm = na.rm)
+  }
+)
+
+
+# 19 IM_P75
+
+base$IM_P75 = estatistica(
+  as.numeric(dados_sinasc_2$IDADEMAE),
+  function(x, na.rm) {
+    quantile(x, 0.75, na.rm = na.rm)
+  }
+)
+
+
+# 20 IM_MD - idade média materna
+
+base$IM_MD = estatistica(
+  as.numeric(dados_sinasc_2$IDADEMAE),
+  mean
+)
+
+
+# 21 IM_DP - desvio-padrão da idade materna
+
+base$IM_DP = estatistica(
+  as.numeric(dados_sinasc_2$IDADEMAE),
+  sd
+)
+
+
+# 22 EM_S - sem escolaridade
+
+base$EM_S = contar(
+  dados_sinasc_2$ESCMAE2010 == "Sem escolaridade"
+)
+
+
+# 23 EM_FI - fundamental I
+
+base$EM_FI = contar(
+  dados_sinasc_2$ESCMAE2010 == "Fundamental I"
+)
+
+
+# 24 EM_FII - fundamental II
+
+base$EM_FII = contar(
+  dados_sinasc_2$ESCMAE2010 == "Fundamental II"
+)
+
+
+# 25 EM_M - médio
+
+base$EM_M = contar(
+  dados_sinasc_2$ESCMAE2010 == "Médio"
+)
+
+
+# 26 EM_SI - superior incompleto
+
+base$EM_SI = contar(
+  dados_sinasc_2$ESCMAE2010 == "Superior incompleto"
+)
+
+
+# 27 EM_SC - superior completo
+
+base$EM_SC = contar(
+  dados_sinasc_2$ESCMAE2010 == "Superior completo"
+)
+
+
+# 28 TGRC_B - raça/cor branca
+
+base$TGRC_B = contar(
+  dados_sinasc_2$RACACOR == "Branca"
+)
+
+
+# 29 TGRC_PT - raça/cor preta
+
+base$TGRC_PT = contar(
+  dados_sinasc_2$RACACOR == "Preta"
+)
+
+
+# 30 TGRC_A - raça/cor amarela
+
+base$TGRC_A = contar(
+  dados_sinasc_2$RACACOR == "Amarela"
+)
+
+
+# 31 TGRC_PD - raça/cor parda
+
+base$TGRC_PD = contar(
+  dados_sinasc_2$RACACOR == "Parda"
+)
+
+
+# 32 TGRC_I - raça/cor indígena
+
+base$TGRC_I = contar(
+  dados_sinasc_2$RACACOR == "Indígena"
+)
+
+
+# 33 TGSC - sem companheiro
+
+base$TGSC = contar(
+  dados_sinasc_2$ESTCIV == "Sem companheiro"
+)
+
+
+# 34 TGCC - com companheiro
+
+base$TGCC = contar(
+  dados_sinasc_2$ESTCIV == "Com companheiro"
+)
+
+
+# 35 TGPRI - primíparas
+
+base$TGPRI = contar(
+  dados_sinasc_2$PARIDADE == "Nulípara"
+)
+
+
+# 36 TGNPRI - não primíparas
+
+base$TGNPRI = contar(
+  dados_sinasc_2$PARIDADE == "Multípara"
+)
+
+# INFORMAÇÕES SOBRE AS GESTAÇÕES
+
+# 37 TGU - gestações únicas
+
+base$TGU = contar(
+  dados_sinasc_2$GRAVIDEZ == "Única"
+)
+
+
+# 38 TGG - gestações gemelares
+
+base$TGG = contar(
+  dados_sinasc_2$GRAVIDEZ %in%
+    c(
+      "Dupla",
+      "Tripla ou mais"
+    )
+)
+
+
+# 39 TGD_22 - menos de 22 semanas
+
+base$TGD_22 = contar(
+  dados_sinasc_2$SEMAGESTAC < 22
+)
+
+
+# 40 TGD_22_27
+
+base$TGD_22_27 = contar(
+  dados_sinasc_2$SEMAGESTAC >= 22 &
+    dados_sinasc_2$SEMAGESTAC <= 27
+)
+
+
+# 41 TGD_28_31
+
+base$TGD_28_31 = contar(
+  dados_sinasc_2$SEMAGESTAC >= 28 &
+    dados_sinasc_2$SEMAGESTAC <= 31
+)
+
+
+# 42 TGD_32_36
+
+base$TGD_32_36 = contar(
+  dados_sinasc_2$SEMAGESTAC >= 32 &
+    dados_sinasc_2$SEMAGESTAC <= 36
+)
+
+
+# 43 TGD_37_41
+
+base$TGD_37_41 = contar(
+  dados_sinasc_2$SEMAGESTAC >= 37 &
+    dados_sinasc_2$SEMAGESTAC <= 41
+)
+
+
+# 44 TGD_42
+
+base$TGD_42 = contar(
+  dados_sinasc_2$SEMAGESTAC >= 42
+)
+
+
+# 45 TGD_PRT - pré-termo
+
+base$TGD_PRT = contar(
+  dados_sinasc_2$SEMAGESTAC < 37
+)
+
+
+# 46 TGD_AT - a termo
+
+base$TGD_AT = contar(
+  dados_sinasc_2$SEMAGESTAC >= 37 &
+    dados_sinasc_2$SEMAGESTAC <= 41
+)
+
+
+# 47 TGD_PST - pós-termo
+
+base$TGD_PST = contar(
+  dados_sinasc_2$SEMAGESTAC >= 42
+)
+
+
+# 48 DG_P25
+
+base$DG_P25 = estatistica(
+  as.numeric(dados_sinasc_2$SEMAGESTAC),
+  function(x, na.rm) {
+    quantile(x, 0.25, na.rm = na.rm)
+  }
+)
+
+
+# 49 DG_P50
+
+base$DG_P50 = estatistica(
+  as.numeric(dados_sinasc_2$SEMAGESTAC),
+  function(x, na.rm) {
+    quantile(x, 0.50, na.rm = na.rm)
+  }
+)
+
+
+# 50 DG_P75
+
+base$DG_P75 = estatistica(
+  as.numeric(dados_sinasc_2$SEMAGESTAC),
+  function(x, na.rm) {
+    quantile(x, 0.75, na.rm = na.rm)
+  }
+)
+
+
+# 51 DG_MD
+
+base$DG_MD = estatistica(
+  as.numeric(dados_sinasc_2$SEMAGESTAC),
+  mean
+)
+
+
+# 52 DG_DP
+
+base$DG_DP = estatistica(
+  as.numeric(dados_sinasc_2$SEMAGESTAC),
+  sd
+)
+
+
+# 53 TKC_NR - não realizou pré-natal
+
+base$TKC_NR = contar(
+  dados_sinasc_2$KOTELCHUCK ==
+    "Não realizou pré-natal"
+)
+
+
+# 54 TKC_ID - pré-natal inadequado
+
+base$TKC_ID = contar(
+  dados_sinasc_2$KOTELCHUCK ==
+    "Inadequado"
+)
+
+
+# 55 TKC_IT - pré-natal intermediário
+
+base$TKC_IT = contar(
+  dados_sinasc_2$KOTELCHUCK ==
+    "Intermediário"
+)
+
+
+# 56 TKC_AD - pré-natal adequado
+
+base$TKC_AD = contar(
+  dados_sinasc_2$KOTELCHUCK ==
+    "Adequado"
+)
+
+
+# 57 TKC_MAD - mais que adequado
+
+base$TKC_MAD = contar(
+  dados_sinasc_2$KOTELCHUCK ==
+    "Mais que adequado"
+)
+
+# 58 TGPRG_S - peregrinaram
+
+base$TGPRG_S = contar(
+  dados_sinasc_2$PEREG == "Sim"
+)
+
+
+# 59 TGPRG_N - não peregrinaram
+
+base$TGPRG_N = contar(
+  dados_sinasc_2$PEREG == "Não"
+)
+
+
+# 60 TPV - parto vaginal
+
+base$TPV = contar(
+  dados_sinasc_2$PARTO == "Vaginal"
+)
+
+
+# 61 TPC - parto cesáreo
+
+base$TPC = contar(
+  dados_sinasc_2$PARTO == "Cesáreo"
+)
+
+
+# 62 TRAP_C - apresentação cefálica
+
+base$TRAP_C = contar(
+  dados_sinasc_2$TPAPRESENT == "Cefálico"
+)
+
+
+# 63 TRAP_P - apresentação pélvica ou podálica
+
+base$TRAP_P = contar(
+  dados_sinasc_2$TPAPRESENT ==
+    "Pélvica ou podálica"
+)
+
+
+# 64 TRAP_T - apresentação transversa
+
+base$TRAP_T = contar(
+  dados_sinasc_2$TPAPRESENT == "Transversa"
+)
+
+
+# 65 TGROB_1
+
+base$TGROB_1 = contar(
+  dados_sinasc_2$TPROBSON == "Grupo de Robson 1"
+)
+
+
+# 66 TGROB_2
+
+base$TGROB_2 = contar(
+  dados_sinasc_2$TPROBSON == "Grupo de Robson 2"
+)
+
+
+# 67 TGROB_3
+
+base$TGROB_3 = contar(
+  dados_sinasc_2$TPROBSON == "Grupo de Robson 3"
+)
+
+
+# 68 TGROB_4
+
+base$TGROB_4 = contar(
+  dados_sinasc_2$TPROBSON == "Grupo de Robson 4"
+)
+
+
+# 69 TGROB_5
+
+base$TGROB_5 = contar(
+  dados_sinasc_2$TPROBSON == "Grupo de Robson 5"
+)
+
+
+# 70 TGROB_6
+
+base$TGROB_6 = contar(
+  dados_sinasc_2$TPROBSON == "Grupo de Robson 6"
+)
+
+
+# 71 TGROB_7
+
+base$TGROB_7 = contar(
+  dados_sinasc_2$TPROBSON == "Grupo de Robson 7"
+)
+
+
+# 72 TGROB_8
+
+base$TGROB_8 = contar(
+  dados_sinasc_2$TPROBSON == "Grupo de Robson 8"
+)
+
+
+# 73 TGROB_9
+
+base$TGROB_9 = contar(
+  dados_sinasc_2$TPROBSON == "Grupo de Robson 9"
+)
+
+
+# 74 TGROB_10
+
+base$TGROB_10 = contar(
+  dados_sinasc_2$TPROBSON == "Grupo de Robson 10"
+)
+
+
+# 75 TNLOC_H - hospital
+
+base$TNLOC_H = contar(
+  dados_sinasc_2$LOCNASC == "Hospital"
+)
+
+
+# 76 TNLOC_ES - outros estabelecimentos de saúde
+
+base$TNLOC_ES = contar(
+  dados_sinasc_2$LOCNASC ==
+    "Outros estabelecimentos de saúde"
+)
+
+
+# 77 TNLOC_D - domicílio
+
+base$TNLOC_D = contar(
+  dados_sinasc_2$LOCNASC == "Domicílio"
+)
+
+
+# 78 TNLOC_O - outros
+
+base$TNLOC_O = contar(
+  dados_sinasc_2$LOCNASC == "Outros"
+)
+
+
+# 79 TNLOC_AI - aldeia indígena
+
+base$TNLOC_AI = contar(
+  dados_sinasc_2$LOCNASC == "Aldeia indígena"
+)
+
+# 80 TRS_M - sexo masculino
+
+base$TRS_M = contar(
+  dados_sinasc_2$SEXO == "Masculino"
+)
+
+
+# 81 TRS_F - sexo feminino
+
+base$TRS_F = contar(
+  dados_sinasc_2$SEXO == "Feminino"
+)
+
+
+# 82 TRRC_B - branca
+
+base$TRRC_B = contar(
+  dados_sinasc_2$RACACOR == "Branca"
+)
+
+
+# 83 TRRC_PT - preta
+
+base$TRRC_PT = contar(
+  dados_sinasc_2$RACACOR == "Preta"
+)
+
+
+# 84 TRRC_A - amarela
+
+base$TRRC_A = contar(
+  dados_sinasc_2$RACACOR == "Amarela"
+)
+
+
+# 85 TRRC_PD - parda
+
+base$TRRC_PD = contar(
+  dados_sinasc_2$RACACOR == "Parda"
+)
+
+
+# 86 TRRC_I - indígena
+
+base$TRRC_I = contar(
+  dados_sinasc_2$RACACOR == "Indígena"
+)
+
+
+# 87 TRP_BP - baixo peso
+
+base$TRP_BP = contar(
+  as.numeric(dados_sinasc_2$PESO) < 2500
+)
+
+
+# 88 TRP_N - peso normal
+
+base$TRP_N = contar(
+  as.numeric(dados_sinasc_2$PESO) >= 2500 &
+    as.numeric(dados_sinasc_2$PESO) < 4000
+)
+
+
+# 89 TRP_M - macrossomia
+
+base$TRP_M = contar(
+  as.numeric(dados_sinasc_2$PESO) >= 4000
+)
+
+
+# 90 PESO_P25
+
+base$PESO_P25 = estatistica(
+  as.numeric(dados_sinasc_2$PESO),
+  function(x, na.rm) {
+    quantile(x, 0.25, na.rm = na.rm)
+  }
+)
+
+
+# 91 PESO_P50
+
+base$PESO_P50 = estatistica(
+  as.numeric(dados_sinasc_2$PESO),
+  function(x, na.rm) {
+    quantile(x, 0.50, na.rm = na.rm)
+  }
+)
+
+
+# 92 PESO_P75
+
+base$PESO_P75 = estatistica(
+  as.numeric(dados_sinasc_2$PESO),
+  function(x, na.rm) {
+    quantile(x, 0.75, na.rm = na.rm)
+  }
+)
+
+
+# 93 PESO_MD
+
+base$PESO_MD = estatistica(
+  as.numeric(dados_sinasc_2$PESO),
+  mean
+)
+
+
+# 94 PESO_DP
+
+base$PESO_DP = estatistica(
+  as.numeric(dados_sinasc_2$PESO),
+  sd
+)
+
+
+# 95 TRPIG_P - PIG em gestações únicas
+
+base$TRPIG_P = contar(
+  dados_sinasc_2$GRAVIDEZ == "Única" &
+    dados_sinasc_2$F_PIG == "PIG"
+)
+
+
+# 96 TRPIG_A - AIG em gestações únicas
+
+base$TRPIG_A = contar(
+  dados_sinasc_2$GRAVIDEZ == "Única" &
+    dados_sinasc_2$F_PIG == "AIG"
+)
+
+
+# 97 TRPIG_G - GIG em gestações únicas
+
+base$TRPIG_G = contar(
+  dados_sinasc_2$GRAVIDEZ == "Única" &
+    dados_sinasc_2$F_PIG == "GIG"
+)
+
+
+# 98 TRAPG5_B - Apgar5 baixo
+
+base$TRAPG5_B = contar(
+  dados_sinasc_2$F_APGAR5 == "Baixo"
+)
+
+
+# 99 TRAPG5_N - Apgar5 normal
+
+base$TRAPG5_N = contar(
+  dados_sinasc_2$F_APGAR5 == "Normal"
+)
+
+
+# 100 APG5_MD - média do Apgar5
+
+base$APG5_MD = estatistica(
+  as.numeric(dados_sinasc_2$APGAR5),
+  mean
+)
+
+
+# 101 APG5_DP - desvio-padrão do Apgar5
+
+base$APG5_DP = estatistica(
+  as.numeric(dados_sinasc_2$APGAR5),
+  sd
+)
+
+
+# 102 TRAC - com anomalia congênita
+
+base$TRAC = contar(
+  dados_sinasc_2$IDANOMAL == "Sim"
+)
+
+
+# 103 TRSAC - sem anomalia congênita
+
+base$TRSAC = contar(
+  dados_sinasc_2$IDANOMAL == "Não"
+)
+
+
+# ============================================================
+# CRIAR A LINHA DA UF - PARAÍBA
+# ============================================================
+
+linha_estado = data.frame(
+  CODMUNRES = "25"
+)
+
+
+# ============================================================
+# SOMAR OS INDICADORES DE CONTAGEM
+# ============================================================
+
+variaveis_contagem = c(
+  "TN",
+  "TNRC",
+  "TNRCR",
+  "TGI_15",
+  "TGI_15_19",
+  "TGI_20_24",
+  "TGI_25_29",
+  "TGI_30_34",
+  "TGI_35_39",
+  "TGI_40_44",
+  "TGI_45_49",
+  "TGI_50",
+  "TGIF",
+  "EM_S",
+  "EM_FI",
+  "EM_FII",
+  "EM_M",
+  "EM_SI",
+  "EM_SC",
+  "TGRC_B",
+  "TGRC_PT",
+  "TGRC_A",
+  "TGRC_PD",
+  "TGRC_I",
+  "TGSC",
+  "TGCC",
+  "TGPRI",
+  "TGNPRI",
+  "TGU",
+  "TGG",
+  "TGD_22",
+  "TGD_22_27",
+  "TGD_28_31",
+  "TGD_32_36",
+  "TGD_37_41",
+  "TGD_42",
+  "TGD_PRT",
+  "TGD_AT",
+  "TGD_PST",
+  "TKC_NR",
+  "TKC_ID",
+  "TKC_IT",
+  "TKC_AD",
+  "TKC_MAD",
+  "TGPRG_S",
+  "TGPRG_N",
+  "TPV",
+  "TPC",
+  "TRAP_C",
+  "TRAP_P",
+  "TRAP_T",
+  "TGROB_1",
+  "TGROB_2",
+  "TGROB_3",
+  "TGROB_4",
+  "TGROB_5",
+  "TGROB_6",
+  "TGROB_7",
+  "TGROB_8",
+  "TGROB_9",
+  "TGROB_10",
+  "TNLOC_H",
+  "TNLOC_ES",
+  "TNLOC_D",
+  "TNLOC_O",
+  "TNLOC_AI",
+  "TRS_M",
+  "TRS_F",
+  "TRRC_B",
+  "TRRC_PT",
+  "TRRC_A",
+  "TRRC_PD",
+  "TRRC_I",
+  "TRP_BP",
+  "TRP_N",
+  "TRP_M",
+  "TRPIG_P",
+  "TRPIG_A",
+  "TRPIG_G",
+  "TRAPG5_B",
+  "TRAPG5_N",
+  "TRAC",
+  "TRSAC"
+)
+
+
+for (variavel in variaveis_contagem) {
+  
+  linha_estado[[variavel]] =
+    sum(
+      base[[variavel]],
+      na.rm = TRUE
+    )
+  
+}
+
+
+linha_estado$IM_P25 = quantile(
+  as.numeric(dados_sinasc_2$IDADEMAE),
+  0.25,
+  na.rm = TRUE
+)
+
+linha_estado$IM_P50 = quantile(
+  as.numeric(dados_sinasc_2$IDADEMAE),
+  0.50,
+  na.rm = TRUE
+)
+
+linha_estado$IM_P75 = quantile(
+  as.numeric(dados_sinasc_2$IDADEMAE),
+  0.75,
+  na.rm = TRUE
+)
+
+linha_estado$IM_MD = mean(
+  as.numeric(dados_sinasc_2$IDADEMAE),
+  na.rm = TRUE
+)
+
+linha_estado$IM_DP = sd(
+  as.numeric(dados_sinasc_2$IDADEMAE),
+  na.rm = TRUE
+)
+
+linha_estado$DG_P25 = quantile(
+  as.numeric(dados_sinasc_2$SEMAGESTAC),
+  0.25,
+  na.rm = TRUE
+)
+
+linha_estado$DG_P50 = quantile(
+  as.numeric(dados_sinasc_2$SEMAGESTAC),
+  0.50,
+  na.rm = TRUE
+)
+
+linha_estado$DG_P75 = quantile(
+  as.numeric(dados_sinasc_2$SEMAGESTAC),
+  0.75,
+  na.rm = TRUE
+)
+
+linha_estado$DG_MD = mean(
+  as.numeric(dados_sinasc_2$SEMAGESTAC),
+  na.rm = TRUE
+)
+
+linha_estado$DG_DP = sd(
+  as.numeric(dados_sinasc_2$SEMAGESTAC),
+  na.rm = TRUE
+)
+
+linha_estado$PESO_P25 = quantile(
+  as.numeric(dados_sinasc_2$PESO),
+  0.25,
+  na.rm = TRUE
+)
+
+linha_estado$PESO_P50 = quantile(
+  as.numeric(dados_sinasc_2$PESO),
+  0.50,
+  na.rm = TRUE
+)
+
+linha_estado$PESO_P75 = quantile(
+  as.numeric(dados_sinasc_2$PESO),
+  0.75,
+  na.rm = TRUE
+)
+
+linha_estado$PESO_MD = mean(
+  as.numeric(dados_sinasc_2$PESO),
+  na.rm = TRUE
+)
+
+linha_estado$PESO_DP = sd(
+  as.numeric(dados_sinasc_2$PESO),
+  na.rm = TRUE
+)
+
+
+
+linha_estado$APG5_MD = mean(
+  as.numeric(dados_sinasc_2$APGAR5),
+  na.rm = TRUE
+)
+
+linha_estado$APG5_DP = sd(
+  as.numeric(dados_sinasc_2$APGAR5),
+  na.rm = TRUE
+)
+
+
+SINASC_UF = rbind(
+  linha_estado,
+  base
+)
+
+
+SINASC_UF$NIVEL = c(
+  "UF",
+  rep(
+    "MUNICIPIO",
+    nrow(SINASC_UF) - 1
+  )
+)
+
+SINASC_UF$ANO = 2016
+
+SINASC_UF = SINASC_UF[
+  ,
+  c(
+    "ANO",
+    "NIVEL",
+    "CODMUNRES",
+    
+    "TN",
+    "TNRC",
+    "TNRCR",
+    
+    "TGI_15",
+    "TGI_15_19",
+    "TGI_20_24",
+    "TGI_25_29",
+    "TGI_30_34",
+    "TGI_35_39",
+    "TGI_40_44",
+    "TGI_45_49",
+    "TGI_50",
+    "TGIF",
+    
+    "IM_P25",
+    "IM_P50",
+    "IM_P75",
+    "IM_MD",
+    "IM_DP",
+    
+    "EM_S",
+    "EM_FI",
+    "EM_FII",
+    "EM_M",
+    "EM_SI",
+    "EM_SC",
+    
+    "TGRC_B",
+    "TGRC_PT",
+    "TGRC_A",
+    "TGRC_PD",
+    "TGRC_I",
+    
+    "TGSC",
+    "TGCC",
+    
+    "TGPRI",
+    "TGNPRI",
+    
+    "TGU",
+    "TGG",
+    
+    "TGD_22",
+    "TGD_22_27",
+    "TGD_28_31",
+    "TGD_32_36",
+    "TGD_37_41",
+    "TGD_42",
+    "TGD_PRT",
+    "TGD_AT",
+    "TGD_PST",
+    
+    "DG_P25",
+    "DG_P50",
+    "DG_P75",
+    "DG_MD",
+    "DG_DP",
+    
+    "TKC_NR",
+    "TKC_ID",
+    "TKC_IT",
+    "TKC_AD",
+    "TKC_MAD",
+    
+    "TGPRG_S",
+    "TGPRG_N",
+    
+    "TPV",
+    "TPC",
+    
+    "TRAP_C",
+    "TRAP_P",
+    "TRAP_T",
+    
+    "TGROB_1",
+    "TGROB_2",
+    "TGROB_3",
+    "TGROB_4",
+    "TGROB_5",
+    "TGROB_6",
+    "TGROB_7",
+    "TGROB_8",
+    "TGROB_9",
+    "TGROB_10",
+    
+    "TNLOC_H",
+    "TNLOC_ES",
+    "TNLOC_D",
+    "TNLOC_O",
+    "TNLOC_AI",
+    
+    "TRS_M",
+    "TRS_F",
+    
+    "TRRC_B",
+    "TRRC_PT",
+    "TRRC_A",
+    "TRRC_PD",
+    "TRRC_I",
+    
+    "TRP_BP",
+    "TRP_N",
+    "TRP_M",
+    
+    "PESO_P25",
+    "PESO_P50",
+    "PESO_P75",
+    "PESO_MD",
+    "PESO_DP",
+    
+    "TRPIG_P",
+    "TRPIG_A",
+    "TRPIG_G",
+    
+    "TRAPG5_B",
+    "TRAPG5_N",
+    "APG5_MD",
+    "APG5_DP",
+    
+    "TRAC",
+    "TRSAC"
+  )
+]
+
+# CODMUNRES como character
+
+SINASC_UF$CODMUNRES =
+  as.character(SINASC_UF$CODMUNRES)
+
+# CONFERÊNCIAS
+
+
+dim(SINASC_UF)
+names(SINASC_UF)
+str(SINASC_UF)
+head(SINASC_UF)
+
 # Ao terminar a Tarefa 9 commit com a mensagem "script BDEM - SINASC - tarefas 1 a 9" e envie para o repositório Projeto_BDEM_2016
 
 
