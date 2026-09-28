@@ -2449,7 +2449,7 @@ write.csv(
   row.names = FALSE
 )
 
-# Ao terminar a Tarefa 10 commit com o comentário "dados SINASC_UF 2016 e script - SIM - tarefas 1 a 10" e envie para o repositório Projeto_BDEM_2016
+# Ao terminar a Tarefa 10 commit com o comentário "dados SINASC_UF 2016 e script - SINASC - tarefas 1 a 10" e envie para o repositório Projeto_BDEM_2016
 
 ####################################
 # ETAPA 3: BANCOS DE DADOS DO SIDRA
