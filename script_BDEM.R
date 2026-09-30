@@ -3102,25 +3102,285 @@ head(dados_sidra_4)
 # Tarefa 3. Selecionar em dados_sidra_ 1 a dados_sidra_4 a UF de responsabilidade do aluno 
 # e chamar os bancos de dados, respectivamente por sidra_1, sidra_2, sidra_3 e sidra_4
 
-sidra_1 = dados_sidra_1[dados_sidra_1$CODUF == "25", ]
-sidra_2 = dados_sidra_2[dados_sidra_2$CODUF == "25", ]
-sidra_3 = dados_sidra_3[
-  substr(as.character(dados_sidra_3$CODMUNRES), 1, 2) == "25", ]
-sidra_4 = dados_sidra_4[dados_sidra_4$CODUF == "25", ]
+sidra_1 =
+  dados_sidra_1[dados_sidra_1$CODUF == "25", ]
+
+sidra_2 =
+  dados_sidra_2[dados_sidra_2$CODUF == "25", ]
+
+
+# No banco 3 os códigos das UFs estão como numéricos
+# Portanto, transformamos para inteiro antes da seleção
+
+dados_sidra_3$CODMUNRES =
+  as.character(as.integer(dados_sidra_3$CODMUNRES))
+
+sidra_3 =
+  dados_sidra_3[dados_sidra_3$CODMUNRES == "25", ]
+
+
+sidra_4 =
+  dados_sidra_4[dados_sidra_4$CODUF == "25", ]
 
 dim(sidra_1)
 dim(sidra_2)
 dim(sidra_3)
 dim(sidra_4)
+
 head(sidra_1)
 head(sidra_2)
 head(sidra_3)
 head(sidra_4)
 
+
+
 # Ao terminar a Tarefa 3 commit com a mensagem "script BDEM - SIDRA - tarefas 1 a 3" e envie para o repositório Projeto_BDEM_2016
 
 
 # Tarefa 4: Criar um banco de dados, de nome SIDRA_UF.csv (Exemplo: SIDRA_RJ.csv), contendo as variáveis listadas no arquivo “Variáveis - Projeto - Tarefa 4 - SIDRA.pdf”
+
+sidra_1$CODMUNRES =
+  as.character(sidra_1$CODMUNRES)
+
+sidra_2$CODMUNRES =
+  as.character(sidra_2$CODMUNRES)
+
+sidra_3$CODMUNRES =
+  as.character(sidra_3$CODMUNRES)
+
+sidra_4$CODMUNRES =
+  as.character(sidra_4$CODMUNRES)
+
+pop_estimada =
+  sidra_1[, c("CODMUNRES", "POPRE_T")]
+
+pop_censo =
+  sidra_2[, c(
+    "CODMUNRES",
+    "POPRC_T",
+    "POPRC_M",
+    "POPRC_F"
+  )]
+
+idade_uf = data.frame(
+  CODMUNRES = sidra_3$CODMUNRES,
+  F_IDADE = sidra_3$F_IDADE,
+  POP = sidra_3$POP,
+  POPF = sidra_3$POPF
+)
+
+
+# Criar variável de grupo
+
+idade_uf$grupo = NA
+
+
+# Menos de 15 anos
+
+idade_uf$grupo[
+  idade_uf$F_IDADE %in% c(
+    "0 a 4 anos",
+    "5 a 9 anos",
+    "10 a 14 anos"
+  )
+] = "15"
+
+idade_uf$grupo[
+  idade_uf$F_IDADE %in% c(
+    "15 a 19 anos",
+    "20 a 24 anos",
+    "25 a 29 anos",
+    "30 a 34 anos",
+    "35 a 39 anos",
+    "40 a 44 anos",
+    "45 a 49 anos"
+  )
+] = "15_49"
+
+idade_uf$grupo[
+  idade_uf$F_IDADE %in% c(
+    "50 a 54 anos",
+    "55 a 59 anos",
+    "60 a 64 anos",
+    "65 a 69 anos",
+    "70 a 74 anos",
+    "75 a 79 anos",
+    "80 a 89 anos",
+    "90 a 99 anos",
+    "100 anos ou mais"
+  )
+] = "50"
+
+idade_uf_resumo = aggregate(
+  cbind(POP, POPF) ~ CODMUNRES + grupo,
+  data = idade_uf,
+  FUN = sum,
+  na.rm = TRUE
+)
+
+idade_mun = data.frame(
+  CODMUNRES = sidra_4$CODMUNRES,
+  F_IDADE = sidra_4$F_IDADE,
+  POP = sidra_4$POP,
+  POPF = sidra_4$POPF
+)
+
+idade_mun$grupo = NA
+
+idade_mun$grupo[
+  idade_mun$F_IDADE %in% c(
+    "0 a 4 anos",
+    "5 a 9 anos",
+    "10 a 14 anos"
+  )
+] = "15"
+
+idade_mun$grupo[
+  idade_mun$F_IDADE %in% c(
+    "15 a 19 anos",
+    "20 a 24 anos",
+    "25 a 29 anos",
+    "30 a 34 anos",
+    "35 a 39 anos",
+    "40 a 44 anos",
+    "45 a 49 anos"
+  )
+] = "15_49"
+
+idade_mun$grupo[
+  idade_mun$F_IDADE %in% c(
+    "50 a 54 anos",
+    "55 a 59 anos",
+    "60 a 64 anos",
+    "65 a 69 anos",
+    "70 a 74 anos",
+    "75 a 79 anos",
+    "80 a 89 anos",
+    "90 a 99 anos",
+    "100 anos ou mais"
+  )
+] = "50"
+
+idade_mun_resumo = aggregate(
+  cbind(POP, POPF) ~ CODMUNRES + grupo,
+  data = idade_mun,
+  FUN = sum,
+  na.rm = TRUE
+)
+
+idade_resumo = rbind(
+  idade_uf_resumo,
+  idade_mun_resumo
+)
+
+POPRC_15 =
+  idade_resumo[
+    idade_resumo$grupo == "15",
+    c("CODMUNRES", "POP", "POPF")
+  ]
+
+names(POPRC_15) = c(
+  "CODMUNRES",
+  "POPRC_15",
+  "POPRC_F_15"
+)
+
+POPRC_15_49 =
+  idade_resumo[
+    idade_resumo$grupo == "15_49",
+    c("CODMUNRES", "POP", "POPF")
+  ]
+
+names(POPRC_15_49) = c(
+  "CODMUNRES",
+  "POPRC_15_49",
+  "POPRC_F_15_49"
+)
+
+POPRC_50 =
+  idade_resumo[
+    idade_resumo$grupo == "50",
+    c("CODMUNRES", "POP", "POPF")
+  ]
+
+names(POPRC_50) = c(
+  "CODMUNRES",
+  "POPRC_50",
+  "POPRC_F_50"
+)
+
+SIDRA_UF =
+  merge(
+    pop_estimada,
+    pop_censo,
+    by = "CODMUNRES",
+    all = TRUE
+  )
+
+
+SIDRA_UF =
+  merge(
+    SIDRA_UF,
+    POPRC_15,
+    by = "CODMUNRES",
+    all = TRUE
+  )
+
+
+SIDRA_UF =
+  merge(
+    SIDRA_UF,
+    POPRC_15_49,
+    by = "CODMUNRES",
+    all = TRUE
+  )
+
+
+SIDRA_UF =
+  merge(
+    SIDRA_UF,
+    POPRC_50,
+    by = "CODMUNRES",
+    all = TRUE
+  )
+
+SIDRA_UF$ANO = 2016
+
+SIDRA_UF$NIVEL =
+  ifelse(
+    SIDRA_UF$CODMUNRES == "25",
+    "UF",
+    "MUNICIPIO"
+  )
+
+SIDRA_UF =
+  SIDRA_UF[, c(
+    "ANO",
+    "NIVEL",
+    "CODMUNRES",
+    "POPRE_T",
+    "POPRC_T",
+    "POPRC_M",
+    "POPRC_F",
+    "POPRC_15",
+    "POPRC_15_49",
+    "POPRC_50",
+    "POPRC_F_15",
+    "POPRC_F_15_49",
+    "POPRC_F_50"
+  )]
+
+dim(SIDRA_UF)
+
+names(SIDRA_UF)
+
+head(SIDRA_UF)
+
+SIDRA_UF[
+  SIDRA_UF$CODMUNRES == "25",
+]
+
+
 
 # Ao terminar a Tarefa 4 commit com a mensagem "script BDEM - SIDRA - tarefas 1 a 4" e envie para o repositório Projeto_BDEM_2016
 
