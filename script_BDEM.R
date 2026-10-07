@@ -3410,8 +3410,27 @@ write.csv(
 
 # Verificar se a leitura de todos os bancos foi feita corretamente e a estrutura dos dados
 
-# Ao terminar a Tarefa 1 commit com a mensagem "script BDEM - ATLAS - tarefa 1" e envie para o repositório Projeto_BDEM_2016
+codigos_IBGE_2010 = read.csv("códigos dos municípios - 2010.csv",
+                             sep = ";",
+                             header = TRUE,
+                             stringsAsFactors = FALSE)
 
+dados_atlas_1 = read.csv("IDHM - 2010 (CENSO) e 2016 (PNAD) - total e por sexo - UF - Atlas Brasil.csv",
+                         sep = ";",
+                         header = TRUE,
+                         stringsAsFactors = FALSE,
+                         fileEncoding = "latin1")
+
+dados_atlas_2 = read.csv("IDHM - 2010 - municípios - Atlas Brasil.csv",
+                         sep = ";",
+                         header = TRUE,
+                         stringsAsFactors = FALSE)
+
+str(codigos_IBGE_2010)
+str(dados_atlas_1)
+str(dados_atlas_2)
+
+# Ao terminar a Tarefa 1 commit com a mensagem "script BDEM - ATLAS - tarefa 1" e envie para o repositório Projeto_BDEM_2016
 
 # Tarefa 2: Manipular o banco de dados e criar o banco de dados ATLAS_UF
 
