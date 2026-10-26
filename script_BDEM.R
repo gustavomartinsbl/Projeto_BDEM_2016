@@ -3653,10 +3653,68 @@ write.csv(
 # Tarefa 1: Agregar os arquivos SIDRA_UF, ATLAS_UF, SINASC_UF, SIM_UF, SINISA_UF no banco BDEM_UF (Exemplo: BDEM_RJ)
 # Leitura dos 5 bancos de dados expeortados das etapas anteriores
 
+SIDRA_UF = read.csv("SIDRA_PB.csv",
+                    stringsAsFactors = FALSE)
+
+ATLAS_UF = read.csv("ATLAS_PB.csv",
+                    stringsAsFactors = FALSE)
+
+SINASC_UF = read.csv("SINASC_PB.csv",
+                     stringsAsFactors = FALSE)
+
+SIM_UF = read.csv("SIM_PB.csv",
+                  stringsAsFactors = FALSE)
+
+SINISA_UF = read.csv("SINISA_PB.csv",
+                     stringsAsFactors = FALSE)
+
 # Agregação dos bancos
 # Lembre-se que SIDRA e ATLAS tem CODMUNRES com 7 dígitos e SINASC, SIM e SINISA com 6 dígitos
 # Além disso dentro do merge all = TRUE garante a manutenção de qualquer município presente em um dos bancos envolvidos no merge
 
+SIDRA_UF$CODMUNRES = substr(
+  as.character(SIDRA_UF$CODMUNRES), 1, 6
+)
+
+ATLAS_UF$CODMUNRES = substr(
+  as.character(ATLAS_UF$CODMUNRES), 1, 6
+)
+
+SINASC_UF$CODMUNRES = as.character(SINASC_UF$CODMUNRES)
+SIM_UF$CODMUNRES = as.character(SIM_UF$CODMUNRES)
+SINISA_UF$CODMUNRES = as.character(SINISA_UF$CODMUNRES)
+
+# Agregação dos bancos
+
+BDEM_UF = merge(
+  SIDRA_UF,
+  ATLAS_UF,
+  by = c("ANO", "NIVEL", "CODMUNRES"),
+  all = TRUE
+)
+
+BDEM_UF = merge(
+  BDEM_UF,
+  SINASC_UF,
+  by = c("ANO", "NIVEL", "CODMUNRES"),
+  all = TRUE
+)
+
+BDEM_UF = merge(
+  BDEM_UF,
+  SIM_UF,
+  by = c("ANO", "NIVEL", "CODMUNRES"),
+  all = TRUE
+)
+
+BDEM_UF = merge(
+  BDEM_UF,
+  SINISA_UF,
+  by = c("ANO", "NIVEL", "CODMUNRES"),
+  all = TRUE
+)
+
+BDEM_UF <- BDEM_UF[order(BDEM_UF$NIVEL != "UF"), ]
 
 # Ao terminar a Tarefa 1 commit com a mensagem "script BDEM - BDEM - tarefa 1" e envie para o repositório Projeto_BDEM_2016
 
